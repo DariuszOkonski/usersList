@@ -154,6 +154,9 @@ const startApp = () => {
         case Action.Quit:
           Message.showColorized(MessageVariant.Info, 'Bye bye!');
           return;
+        default:
+          Message.showColorized(MessageVariant.Error, 'Command not found');
+          break;
       }
 
       startApp();
