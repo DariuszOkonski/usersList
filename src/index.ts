@@ -89,15 +89,28 @@ class UsersData {
   public remove(name: string) {
     const basicLength = this.data.length;
 
-    const userRemoved = this.data.filter((user) => user.name !== name);
+    this.data = this.data.filter((user) => user.name !== name);
 
-    if (userRemoved.length !== basicLength) {
+    if (this.data.length !== basicLength) {
       Message.showColorized(MessageVariant.Success, 'User deleted!');
     } else {
       Message.showColorized(MessageVariant.Error, 'User not found...');
     }
   }
 }
+
+const users = new UsersData();
+
+console.log('\n');
+console.info('???? Welcome to the UsersApp!');
+console.log('====================================');
+Message.showColorized(MessageVariant.Info, 'Available actions');
+console.log('\n');
+console.log('list – show all users');
+console.log('add – add new user to the list');
+console.log('remove – remove user from the list');
+console.log('quit – quit the app');
+console.log('\n');
 
 const startApp = () => {
   inquirer
@@ -108,11 +121,39 @@ const startApp = () => {
         message: 'How can I help you?',
       },
     ])
-    .then((answers: { action: Action }) => {
-      console.log('Chosen action: ' + answers.action);
-      if (answers.action === 'quit') {
-        console.log('I SHOULD QUIT');
-        return process.exit();
+    .then(async (answers: InquirerAnswers) => {
+      switch (answers.action) {
+        case Action.List:
+          users.showAll();
+          break;
+        case Action.Add:
+          const user = await inquirer.prompt([
+            {
+              name: 'name',
+              type: 'input',
+              message: 'Enter name',
+            },
+            {
+              name: 'age',
+              type: 'number',
+              message: 'Enter age',
+            },
+          ]);
+          users.add(user);
+          break;
+        case Action.Remove:
+          const name = await inquirer.prompt([
+            {
+              name: 'name',
+              type: 'input',
+              message: 'Enter name',
+            },
+          ]);
+          users.remove(name.name);
+          break;
+        case Action.Quit:
+          Message.showColorized(MessageVariant.Info, 'Bye bye!');
+          return;
       }
 
       startApp();
